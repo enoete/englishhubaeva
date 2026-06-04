@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Adiaha's English Writing Hub</title>
+<style>
+:root{
+  --teal:#1a7a6e;--teal-light:#d0ede9;--teal-dark:#125c52;
+  --gold:#c8a84b;--gold-light:#f0dfa0;--gold-pale:#fdf8ec;
+  --purple:#6c3d8a;--purple-light:#ede0f5;
+  --coral:#e05a3a;--coral-light:#fdecea;
+  --blue:#1a5c8a;--blue-light:#d0e4f0;
+  --bg:#fafaf8;--surface:#fff;--border:#e8e4dc;
+  --text:#1c1c1a;--muted:#6b6860;--hint:#9b9790;
+  --success:#2a7a4e;--success-light:#edf7f1;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Georgia',serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.topbar{background:var(--teal);color:white;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:54px;position:sticky;top:0;z-index:200;}
+.topbar-title{font-size:15px;letter-spacing:.03em;}
+.topbar-title span{opacity:.7;font-size:12px;margin-left:8px;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:background .3s;}
+.sync-dot.ok{background:#6de86d;} .sync-dot.saving{background:#f0d060;} .sync-dot.err{background:#f06060;}
+.sync-label{font-size:11px;font-family:'Arial',sans-serif;opacity:.85;min-width:110px;text-align:right;}
+.main-nav{background:var(--teal-dark);display:flex;overflow-x:auto;}
+.main-nav button{padding:12px 20px;font-size:13px;font-family:'Arial',sans-serif;color:rgba(255,255,255,.65);border:none;background:none;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;flex-shrink:0;}
+.main-nav button:hover{color:white;background:rgba(255,255,255,.08);}
+.main-nav button.active{color:white;border-bottom-color:var(--gold);font-weight:bold;}
+.container{max-width:840px;margin:0 auto;padding:2rem 1.5rem;}
+.hero{text-align:center;padding:2rem 1rem 1.5rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.hero-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.hero h1{font-size:24px;font-weight:normal;color:var(--text);margin-bottom:6px;line-height:1.35;}
+.hero h1 em{color:var(--teal);font-style:normal;}
+.hero p{font-size:14px;font-family:'Arial',sans-serif;color:var(--muted);}
+.section-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:2rem 0 1rem;padding-bottom:6px;border-bottom:1px solid var(--gold-light);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;}
+.card-title{font-size:14px;font-weight:bold;font-family:'Arial',sans-serif;color:var(--teal);margin-bottom:8px;}
+.card p,.card li{font-size:14px;font-family:'Arial',sans-serif;color:var(--muted);line-height:1.75;}
+.card ul,.card ol{padding-left:1.3rem;margin-top:6px;} .card li{margin-bottom:4px;} .card strong{color:var(--text);}
+.lesson-box{background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:10px;padding:1.1rem 1.4rem;margin-bottom:1rem;}
+.lesson-box .lb-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);font-family:'Arial',sans-serif;font-weight:bold;margin-bottom:6px;}
+.lesson-box p{font-size:14px;font-family:'Arial',sans-serif;color:var(--text);line-height:1.7;}
+.lesson-box .example{font-style:italic;color:var(--teal);margin-top:8px;padding:8px 12px;background:white;border-radius:6px;border-left:3px solid var(--teal);font-size:14px;line-height:1.6;}
+.sub-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.5rem;overflow-x:auto;}
+.sub-tab{padding:8px 14px;font-size:13px;font-family:'Arial',sans-serif;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.sub-tab.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:bold;}
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+@media(max-width:580px){.topic-grid{grid-template-columns:1fr;}}
+.topic-card{background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:1rem 1.1rem;cursor:pointer;transition:all .15s;}
+.topic-card:hover{border-color:var(--teal);background:var(--teal-light);}
+.topic-card.selected{border-color:var(--teal);background:var(--teal-light);}
+.tc-type{font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-family:'Arial',sans-serif;font-weight:bold;margin-bottom:4px;}
+.tc-type.narrative{color:var(--purple);} .tc-type.persuasive{color:var(--coral);}
+.topic-card h4{font-size:14px;color:var(--text);font-weight:normal;margin-bottom:4px;line-height:1.4;}
+.topic-card p{font-size:12px;font-family:'Arial',sans-serif;color:var(--hint);line-height:1.4;}
+.writing-prompt{background:var(--teal-light);border:1px solid #a0d4cc;border-radius:10px;padding:1.1rem 1.4rem;margin-bottom:1.5rem;}
+.writing-prompt .wp-tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);font-family:'Arial',sans-serif;font-weight:bold;margin-bottom:4px;}
+.writing-prompt .wp-type{font-size:11px;background:var(--teal);color:white;padding:2px 8px;border-radius:20px;font-family:'Arial',sans-serif;display:inline-block;margin-bottom:8px;}
+.writing-prompt h3{font-size:17px;color:var(--text);margin-bottom:6px;font-weight:normal;line-height:1.4;}
+.writing-prompt p{font-size:13px;font-family:'Arial',sans-serif;color:var(--muted);line-height:1.6;}
+.writing-prompt .wp-req{font-size:12px;font-family:'Arial',sans-serif;color:var(--teal);margin-top:8px;padding:6px 10px;background:white;border-radius:6px;line-height:1.6;}
+.section-writer{margin-bottom:1.25rem;}
+.sw-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:4px;}
+.sw-header label{font-size:12px;font-family:'Arial',sans-serif;font-weight:bold;color:var(--text);text-transform:uppercase;letter-spacing:.06em;}
+.sw-badges{display:flex;gap:6px;flex-wrap:wrap;}
+.sw-badge{font-size:11px;background:var(--teal-light);color:var(--teal);padding:2px 8px;border-radius:20px;font-family:'Arial',sans-serif;}
+.sw-badge.warn{background:#fff3cd;color:#856404;}
+.sw-badge.marks{background:var(--gold-pale);color:var(--gold);}
+.sw-hint{font-size:13px;font-family:'Arial',sans-serif;color:var(--hint);margin-bottom:8px;line-height:1.6;padding:8px 10px;background:var(--gold-pale);border-radius:6px;border-left:3px solid var(--gold-light);}
+.sw-checklist{font-size:12px;font-family:'Arial',sans-serif;color:var(--muted);margin-bottom:8px;line-height:1.7;padding:8px 10px;background:#f0faf4;border-radius:6px;border-left:3px solid var(--success);}
+.sw-checklist strong{color:var(--success);}
+textarea.sw-ta{width:100%;resize:vertical;padding:10px 12px;font-size:14px;line-height:1.75;font-family:'Arial',sans-serif;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:6px;outline:none;transition:border-color .15s;}
+textarea.sw-ta:focus{border-color:var(--teal);background:white;}
+.ta-sm{min-height:80px;} .ta-md{min-height:120px;} .ta-lg{min-height:160px;} .ta-xl{min-height:210px;}
+.wc{font-size:11px;font-family:'Arial',sans-serif;color:var(--hint);margin-top:3px;text-align:right;}
+.para-block{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;}
+.para-block-title{font-size:14px;font-weight:bold;font-family:'Arial',sans-serif;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.para-block-title .pb-num{font-size:11px;background:var(--teal);color:white;padding:2px 10px;border-radius:20px;}
+.para-block-title .pb-marks{font-size:11px;background:var(--gold-pale);color:var(--gold);padding:2px 10px;border-radius:20px;}
+.para-block p{font-size:13px;font-family:'Arial',sans-serif;color:var(--muted);margin-bottom:10px;line-height:1.6;}
+.passage-box{background:white;border:1.5px solid var(--border);border-radius:10px;padding:1.75rem;margin-bottom:1.75rem;font-size:15px;line-height:1.95;font-family:'Georgia',serif;color:var(--text);}
+.passage-box h3{font-size:17px;font-family:'Arial',sans-serif;font-weight:bold;color:var(--teal);margin-bottom:4px;text-align:center;}
+.passage-box .passage-meta{font-size:12px;font-family:'Arial',sans-serif;color:var(--hint);text-align:center;margin-bottom:16px;}
+.passage-box p{margin-bottom:.9rem;}
+.passage-box .gloss{font-size:12px;font-family:'Arial',sans-serif;color:var(--muted);margin-top:12px;padding:8px 12px;background:var(--bg);border-radius:6px;border-left:3px solid var(--gold-light);}
+.q-comp{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.q-comp-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:4px;}
+.q-num{font-size:10px;font-family:'Arial',sans-serif;font-weight:bold;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;}
+.q-marks{font-size:11px;background:var(--gold-pale);color:var(--gold);padding:2px 8px;border-radius:20px;font-family:'Arial',sans-serif;}
+.q-type-tag{font-size:10px;background:var(--blue-light);color:var(--blue);padding:2px 8px;border-radius:20px;font-family:'Arial',sans-serif;}
+.q-comp .q-q{font-size:15px;color:var(--text);margin-bottom:10px;line-height:1.6;}
+.q-comp textarea{width:100%;resize:vertical;padding:8px 10px;font-size:14px;font-family:'Arial',sans-serif;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:6px;outline:none;transition:border-color .15s;}
+.q-comp textarea:focus{border-color:var(--teal);background:white;}
+.q-comp select{width:100%;padding:8px 10px;font-size:14px;font-family:'Arial',sans-serif;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);outline:none;}
+.q-comp select:focus{border-color:var(--teal);}
+.total-marks{background:var(--teal-light);border:1px solid #a0d4cc;border-radius:8px;padding:.75rem 1.25rem;margin-bottom:1.5rem;font-size:13px;font-family:'Arial',sans-serif;color:var(--teal);font-weight:bold;}
+.btn{padding:10px 20px;border-radius:7px;font-size:14px;font-family:'Arial',sans-serif;cursor:pointer;border:none;transition:all .15s;}
+.btn-teal{background:var(--teal);color:white;} .btn-teal:hover{background:var(--teal-dark);}
+.btn-share{background:var(--purple);color:white;} .btn-share:hover{background:#5a2e78;}
+.btn-outline{background:transparent;color:var(--teal);border:1.5px solid var(--teal);} .btn-outline:hover{background:var(--teal-light);}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem;}
+.checklist{list-style:none;padding:0;}
+.checklist li{display:flex;align-items:flex-start;gap:10px;font-size:14px;font-family:'Arial',sans-serif;color:var(--muted);margin-bottom:8px;line-height:1.5;}
+.checklist li input[type=checkbox]{margin-top:2px;width:16px;height:16px;accent-color:var(--teal);flex-shrink:0;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:white;border-radius:14px;padding:2rem;max-width:520px;width:92%;max-height:88vh;overflow-y:auto;position:relative;}
+.modal h2{font-size:18px;color:var(--teal);margin-bottom:.4rem;}
+.modal .modal-sub{font-size:13px;font-family:'Arial',sans-serif;color:var(--muted);margin-bottom:1.25rem;line-height:1.6;}
+.modal textarea{width:100%;min-height:180px;padding:10px;font-size:12px;font-family:monospace;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);resize:none;outline:none;}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);}
+.modal-actions{display:flex;gap:10px;margin-top:1rem;flex-wrap:wrap;}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:white;font-size:13px;font-family:'Arial',sans-serif;padding:8px 18px;border-radius:20px;display:none;z-index:999;white-space:nowrap;}
+.pane{display:none;} .pane.active{display:block;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title">Aeva's English Hub <span>Grade 5 Writing &amp; Comprehension</span></div>
+  <div class="topbar-right">
+    <div class="sync-dot" id="sync-dot"></div>
+    <div class="sync-label" id="sync-label"></div>
+  </div>
+</div>
+<div class="main-nav">
+  <button class="active" onclick="showPane('pane-learn',this)">📚 Learn</button>
+  <button onclick="showPane('pane-narrative',this)">✏️ Narrative</button>
+  <button onclick="showPane('pane-persuasive',this)">💬 Persuasive</button>
+  <button onclick="showPane('pane-comp',this)">📖 Comprehension</button>
+</div>
+
+<!-- ═══ LEARN ═══ -->
+<div id="pane-learn" class="pane active"><div class="container">
+  <div class="hero">
+    <div class="hero-label">English Language — Grade 5</div>
+    <h1>Learn the rules. Master the craft. <em>Write brilliantly.</em></h1>
+    <p>Use the tabs to study each essay type and the language tools your teacher expects you to use.</p>
+  </div>
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="subTab('lt-narr',this,'lt')">Narrative Essay</button>
+    <button class="sub-tab" onclick="subTab('lt-pers',this,'lt')">Persuasive Essay</button>
+    <button class="sub-tab" onclick="subTab('lt-lang',this,'lt')">Connectors &amp; Language</button>
+    <button class="sub-tab" onclick="subTab('lt-desc',this,'lt')">Descriptive Techniques</button>
+  </div>
+
+  <div id="lt-narr" class="lt pane active">
+    <div class="section-label">The Narrative Essay — telling a story that matters</div>
+    <div class="card"><div class="card-title">What makes a narrative different from a list?</div>
+    <p>A narrative is not a list of events. It is a living story with a character who wants something, faces a problem, reaches a crisis point, and comes out changed. Every sentence should create tension, build atmosphere, or reveal character. If a sentence does none of these things — cut it.</p></div>
+    <div class="lesson-box"><div class="lb-label">1. Introduction — set the scene, hook the reader</div>
+    <p>Introduce your character, the setting (time and place), and begin the story with a sentence that demands the reader keep going. Use an in-medias-res opening (drop into the middle of action) or a striking image.</p>
+    <div class="example">"The afternoon Cookie squeezed through the gate and vanished into the cane fields was the longest thirty minutes of my life."</div></div>
+    <div class="lesson-box"><div class="lb-label">2. Rising Action — build tension with layers</div>
+    <p>Introduce the problem and make it grow. Use your senses — what do you see, hear, smell, feel? Layer in obstacles. Let your character try and fail before succeeding. Add dialogue to reveal emotion.</p>
+    <div class="example">"I called her name until my throat ached. Kreme sat by the fence, her ears flat, watching me with big brown worried eyes. The sun was dropping and the cane was tall and I had no idea which direction she had gone."</div></div>
+    <div class="lesson-box"><div class="lb-label">3. Climax — the peak, the crisis, the turning point</div>
+    <p>This is the most intense moment. Use short, punchy sentences. Let the emotion peak here. The reader must feel the urgency.</p>
+    <div class="example">"Then I heard it — one sharp, scared bark from somewhere deep in the cane. My heart stopped."</div></div>
+    <div class="lesson-box"><div class="lb-label">4. Falling Action — things begin to resolve</div>
+    <p>The tension drops. The problem starts to be solved. The pace slows slightly. Describe how the situation changes.</p>
+    <div class="example">"I pushed through two rows of cane and found her sitting in the middle of a clearing, tail wagging, a cane leaf stuck in her ear, looking completely satisfied with herself."</div></div>
+    <div class="lesson-box"><div class="lb-label">5. Resolution — what changed, what you learned</div>
+    <p>End with meaning. What did the experience teach you? How are you or the world different now? The last sentence of a narrative is often the most important. Make it count.</p>
+    <div class="example">"That night, as Cookie curled up against my legs, I understood something I had not before: love is terrifying precisely because it is real, and real things can be lost."</div></div>
+  </div>
+
+  <div id="lt-pers" class="lt pane">
+    <div class="section-label">The Persuasive Essay — 6-paragraph structure (from your notes)</div>
+    <div class="card"><div class="card-title">The goal: convince your reader your position is correct</div>
+    <p>A persuasive essay presents a logical argument using evidence, examples, and reasoning. It acknowledges the other side (counter claim) and then dismantles it. Your tone must be <strong>formal</strong> — no "I, you, he, she, me, him, her" in body paragraphs.</p></div>
+    <div class="lesson-box"><div class="lb-label">Paragraph 1 — Introduction (3 parts)</div>
+    <p><strong>Hook:</strong> A statistic, surprising fact, or short anecdote (3 sentences). Grab attention immediately.<br>
+    <strong>Background:</strong> Show you have researched the topic. 1–2 sentences of context.<br>
+    <strong>Thesis:</strong> State your position AND your three reasons in one clear sentence.</p>
+    <div class="example">"It is argued that art and music should be mandatory in all schools because they improve academic performance, protect the mental health of students, and preserve the cultural identity of communities."</div></div>
+    <div class="lesson-box"><div class="lb-label">Paragraphs 2, 3, 4 — Body Paragraphs (3 parts each)</div>
+    <p><strong>Topic Sentence:</strong> State one argument clearly. Use a connector to open.<br>
+    <strong>Three pieces of evidence:</strong> Facts, statistics, examples, expert opinions — each one supporting the topic sentence.<br>
+    <strong>Connection:</strong> The LAST sentence links your evidence back to your thesis. Never skip this.</p></div>
+    <div class="lesson-box"><div class="lb-label">Paragraph 5 — Counter Claim (3 parts)</div>
+    <p><strong>Topic Sentence:</strong> Open with "Admittedly…" or "It is true that…" — acknowledge the other side respectfully.<br>
+    <strong>Their 2–3 arguments:</strong> Be fair. State the opposing arguments properly.<br>
+    <strong>Refutation:</strong> Show why those arguments are flawed or insufficient. Start with "However…" or "Nevertheless…"</p></div>
+    <div class="lesson-box"><div class="lb-label">Paragraph 6 — Conclusion (3 parts)</div>
+    <p><strong>Restate stance:</strong> Begin with "In conclusion…" or "To summarise…" — do NOT use the same words as your thesis.<br>
+    <strong>Brief summary:</strong> Recap each of your three points in one sentence each.<br>
+    <strong>Call to action:</strong> What should the reader, school, government, or society do? End with purpose.</p></div>
+  </div>
+
+  <div id="lt-lang" class="lt pane">
+    <div class="section-label">Connectors — from your own notes</div>
+    <div class="card"><div class="card-title">First paragraph openers</div><ul>
+    <li>To begin / To start off / Firstly / Initially / At first glance / In the first place</li></ul></div>
+    <div class="card"><div class="card-title">Body paragraph connectors</div><ul>
+    <li>Furthermore / Additionally / In addition to / Equally important / Secondly / Next</li>
+    <li>To continue / In continuity / To move on / Moreover / By the same token</li></ul></div>
+    <div class="card"><div class="card-title">Counter claim openers</div><ul>
+    <li>Admittedly… / It is true that… / While some may argue… / It must be acknowledged that…</li></ul></div>
+    <div class="card"><div class="card-title">Conclusion openers</div><ul>
+    <li>To conclude / In conclusion / To summarise / In summary / To sum up / To end / Finally / To this end</li></ul></div>
+    <div class="card"><div class="card-title">Persuasive power phrases</div><ul>
+    <li>It is evident that… / Research clearly shows… / Studies have found… / It is undeniable that…</li>
+    <li>Without question… / It is widely accepted that… / According to [source]…</li>
+    <li>Therefore… / As a result… / Consequently… / This demonstrates that…</li>
+    <li>However… / Nevertheless… / Despite this… / On the contrary… / In contrast…</li></ul></div>
+    <div class="card"><div class="card-title">Critical rule — the connection sentence</div>
+    <p>The <strong>last sentence of every body paragraph</strong> must connect your evidence back to your topic sentence and thesis. It answers: "So what? Why does this prove my argument?" Use: "This proves that… / Therefore it is clear that… / This demonstrates that…"</p></div>
+  </div>
+
+  <div id="lt-desc" class="lt pane">
+    <div class="section-label">Descriptive techniques — make your writing vivid</div>
+    <div class="lesson-box"><div class="lb-label">Show, Don't Tell</div>
+    <p><strong>Telling (weak):</strong> She was scared.<br><strong>Showing (strong):</strong> Her palms had gone cold. She pressed them flat against her thighs to stop them shaking.</p></div>
+    <div class="lesson-box"><div class="lb-label">Five Senses — use at least two per scene</div>
+    <p>SIGHT: colours, shapes, movement, light<br>SOUND: what you hear, how loud, how close<br>SMELL: sharp, sweet, rotting, fresh<br>TOUCH: temperature, texture, pain, comfort<br>TASTE: sweet, bitter, salty, metallic</p>
+    <div class="example">"The market smelled of ripe sapodilla and something frying in coconut oil. Stalls blazed in primary colours — tomatoes like rubies, yellow-green limes piled high, dark purple aubergines in a heap."</div></div>
+    <div class="lesson-box"><div class="lb-label">Simile — comparing with "like" or "as"</div>
+    <div class="example">"The sea lay flat as hammered silver." / "She sang like someone who had been holding the note inside her whole life."</div></div>
+    <div class="lesson-box"><div class="lb-label">Metaphor — saying something IS something else</div>
+    <div class="example">"The stage was a country she had always wanted to visit." / "The applause was a wave breaking over her."</div></div>
+    <div class="lesson-box"><div class="lb-label">Personification — giving human qualities to non-human things</div>
+    <div class="example">"The wind gossiped through the coconut palms." / "The old church watched the village from the hilltop."</div></div>
+    <div class="lesson-box"><div class="lb-label">Dialogue — let your characters speak</div>
+    <p>Dialogue makes a story feel alive. Every new speaker gets a new paragraph. Use speech verbs beyond "said": whispered, demanded, muttered, insisted, called out.</p>
+    <div class="example">"Dad," I whispered, "do you think we made a mistake?"<br>He was quiet for a long time.<br>"We made a choice," he said finally. "Those are different things."</div></div>
+    <div class="lesson-box"><div class="lb-label">Short sentences for tension</div>
+    <p>When the action peaks — use short sentences. They create pace and urgency.</p>
+    <div class="example">"I ran. The cane closed behind me. I couldn't see her. I couldn't hear anything. Then — silence."</div></div>
+  </div>
+</div></div>
+
+<!-- ═══ NARRATIVE ═══ -->
+<div id="pane-narrative" class="pane"><div class="container">
+  <div class="hero">
+    <div class="hero-label">Narrative Writing</div>
+    <h1>Tell a story that <em>the reader cannot put down</em></h1>
+    <p>Choose a topic below. Write each section separately — this helps you build a proper story arc. Your work saves automatically.</p>
+  </div>
+  <div class="section-label">Choose your topic</div>
+  <div class="topic-grid" id="narrative-topics">
+    <div class="topic-card" data-topic="n1" onclick="pickTopic('narrative','n1',this)">
+      <div class="tc-type narrative">Narrative — Personal</div>
+      <h4>The night before my biggest performance</h4>
+      <p>You are hours away from stepping on a stage that could change everything. What happens inside and around you?</p>
+    </div>
+    <div class="topic-card" data-topic="n2" onclick="pickTopic('narrative','n2',this)">
+      <div class="tc-type narrative">Narrative — Adventure</div>
+      <h4>The day Cookie, Kreme and Coco all disappeared</h4>
+      <p>All three dogs are gone. You have one afternoon to find them before dark.</p>
+    </div>
+    <div class="topic-card" data-topic="n3" onclick="pickTopic('narrative','n3',this)">
+      <div class="tc-type narrative">Narrative — Travel</div>
+      <h4>Arriving in Amsterdam — everything was different</h4>
+      <p>Your first morning in Holland. What you saw, felt, smelled, and discovered. How did it change how you saw home?</p>
+    </div>
+    <div class="topic-card" data-topic="n4" onclick="pickTopic('narrative','n4',this)">
+      <div class="tc-type narrative">Narrative — Conflict</div>
+      <h4>The argument that taught me something important</h4>
+      <p>A disagreement with someone you love. What happened, how it felt, and what you both learned.</p>
+    </div>
+    <div class="topic-card" data-topic="n5" onclick="pickTopic('narrative','n5',this)">
+      <div class="tc-type narrative">Narrative — Imagination</div>
+      <h4>I woke up and the island was completely silent</h4>
+      <p>Every person, every animal — gone. You are alone on St. Kitts. What do you do, what do you find, and how does it end?</p>
+    </div>
+    <div class="topic-card" data-topic="n6" onclick="pickTopic('narrative','n6',this)">
+      <div class="tc-type narrative">Narrative — Hardship</div>
+      <h4>The storm that changed our street forever</h4>
+      <p>A powerful storm hits the neighbourhood. Tell the story from inside the house — the waiting, the storm itself, and what you found afterwards.</p>
+    </div>
+  </div>
+
+  <div id="narrative-writer" style="display:none;">
+    <div class="writing-prompt" id="narrative-prompt-display"></div>
+    <div class="section-label">Write your story — section by section</div>
+
+    <div class="para-block">
+      <div class="para-block-title"><span class="pb-num">Part 1</span> Introduction <span class="pb-marks">~80–120 words</span></div>
+      <p>Set the scene. Introduce your character and where/when we are. Hook the reader with your very first sentence — drop them into the action or paint a striking image. Do NOT begin with "One day…" or "My name is…"</p>
+      <div class="section-writer">
+        <div class="sw-hint">Try starting in the middle of a moment. What were you doing, seeing, or feeling right as the story begins? Use at least one sensory detail in your opening paragraph.</div>
+        <textarea id="n-intro" class="sw-ta ta-lg" placeholder="Begin here…" oninput="autosave('narrative'); wc(this,'wc-n-intro')"></textarea>
+        <div class="wc" id="wc-n-intro">0 words</div>
+      </div>
+    </div>
+
+    <div class="para-block">
+      <div class="para-block-title"><span class="pb-num">Part 2</span> Rising Action <span class="pb-marks">~120–180 words</span></div>
+      <p>The problem begins and grows. Things go wrong, or get harder. Obstacles appear. Your character tries and maybe fails. Include at least one piece of dialogue and two sensory details.</p>
+      <div class="section-writer">
+        <div class="sw-hint">Ask yourself: what makes this harder? What new problem appears just when things seemed okay? Layer your obstacles. Show — don't tell — how your character is feeling.</div>
+        <textarea id="n-rising" class="sw-ta ta-xl" placeholder="The problem grows…" oninput="autosave('narrative'); wc(this,'wc-n-rising')"></textarea>
+        <div class="wc" id="wc-n-rising">0 words</div>
+      </div>
+    </div>
+
+    <div class="para-block">
+      <div class="para-block-title"><span class="pb-num">Part 3</span> Climax <span class="pb-marks">~80–120 words</span></div>
+      <p>The peak. The most intense, frightening, or emotional moment. Use short sentences to build pace. This is the turning point — something changes here that cannot be unchanged.</p>
+      <div class="section-writer">
+        <div class="sw-hint">Short sentences = urgency. Think: what is the single worst or most intense moment? Then stretch time — slow it down, describe every detail, every heartbeat. Make the reader hold their breath.</div>
+        <textarea id="n-climax" class="sw-ta ta-lg" placeholder="The crisis moment…" oninput="autosave('narrative'); wc(this,'wc-n-climax')"></textarea>
+        <div class="wc" id="wc-n-climax">0 words</div>
+      </div>
+    </div>
+
+    <div class="para-block">
+      <div class="para-block-title"><span class="pb-num">Part 4</span> Falling Action <span class="pb-marks">~80–100 words</span></div>
+      <p>The tension drops. The problem begins to resolve. Things calm down. How does the situation start to be fixed? The pace slows here — longer sentences, quieter language.</p>
+      <div class="section-writer">
+        <div class="sw-hint">Contrast with the climax. Where the climax was fast and breathless, this should feel slower, calmer, like coming up for air. Use a longer sentence after your short climax sentences.</div>
+        <textarea id="n-falling" class="sw-ta ta-md" placeholder="Things begin to calm down…" oninput="autosave('narrative'); wc(this,'wc-n-falling')"></textarea>
+        <div class="wc" id="wc-n-falling">0 words</div>
+      </div>
+    </div>
+
+    <div class="para-block">
+      <div class="para-block-title"><span class="pb-num">Part 5</span> Resolution <span class="pb-marks">~60–90 words</span></div>
+      <p>How does the story end? What did you learn? How have you changed? The final sentence of a good narrative is often the most powerful sentence in the whole piece — make it count.</p>
+      <div class="section-writer">
+        <div class="sw-hint">Don't just wrap up the plot — wrap up the meaning. What truth did this experience teach you? Write a final sentence that feels complete and important, like the last note of a song.</div>
+        <textarea id="n-resolution" class="sw-ta ta-md" placeholder="The ending and what it meant…" oninput="autosave('narrative'); wc(this,'wc-n-resolution')"></textarea>
+        <div class="wc" id="wc-n-resolution">0 words</div>
+      </div>
+    </div>
+
+    <div class="section-label">Self-check before sharing</div>
+    <ul class="checklist">
+      <li><input type="checkbox"> My opening sentence does NOT begin with "One day" or "My name is"</li>
+      <li><input type="checkbox"> I used at least THREE senses across my story</li>
+      <li><input type="checkbox"> I have at least one piece of dialogue with correct punctuation</li>
+      <li><input type="checkbox"> I used at least one simile, metaphor, OR personification</li>
+      <li><input type="checkbox"> My climax uses short sentences to create tension</li>
+      <li><input type="checkbox"> My resolution says what I LEARNED or how I CHANGED — not just what happened</li>
+      <li><input type="checkbox"> I have read the whole story out loud at least once</li>
+      <li><input type="checkbox"> Every paragraph is at least 3–4 sentences long</li>
+    </ul>
+    <div class="btn-row">
+      <button class="btn btn-share" onclick="openShare('narrative')">📤 Share with Dad</button>
+      <button class="btn btn-outline" onclick="clearSection('narrative')">Start over</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ═══ PERSUASIVE ═══ -->
+<div id="pane-persuasive" class="pane"><div class="container">
+  <div class="hero">
+    <div class="hero-label">Persuasive Writing</div>
+    <h1>Build an argument so strong <em>it cannot be ignored</em></h1>
+    <p>Choose a topic. Write each paragraph in its labelled sections. The structure from your notes is built in — follow it exactly. Saves automatically.</p>
+  </div>
+  <div class="section-label">Choose your topic</div>
+  <div class="topic-grid" id="persuasive-topics">
+    <div class="topic-card" data-topic="p1" onclick="pickTopic('persuasive','p1',this)">
+      <div class="tc-type persuasive">Persuasive — Education</div>
+      <h4>Art and Music should be mandatory in all schools</h4>
+      <p>Argue that every school must include creative subjects. This is your lived experience — use it.</p>
+    </div>
+    <div class="topic-card" data-topic="p2" onclick="pickTopic('persuasive','p2',this)">
+      <div class="tc-type persuasive">Persuasive — School Life</div>
+      <h4>Homework should no longer be required in schools</h4>
+      <p>Argue that compulsory homework does more harm than good for students' wellbeing and development.</p>
+    </div>
+    <div class="topic-card" data-topic="p3" onclick="pickTopic('persuasive','p3',this)">
+      <div class="tc-type persuasive">Persuasive — Animal Rights</div>
+      <h4>Zoos should be banned worldwide</h4>
+      <p>Argue that no animal should be kept in a zoo, regardless of conservation claims.</p>
+    </div>
+    <div class="topic-card" data-topic="p4" onclick="pickTopic('persuasive','p4',this)">
+      <div class="tc-type persuasive">Persuasive — Technology</div>
+      <h4>Social media should be banned for children under 16</h4>
+      <p>Argue that the harm caused to young people by social media justifies a legal age restriction.</p>
+    </div>
+    <div class="topic-card" data-topic="p5" onclick="pickTopic('persuasive','p5',this)">
+      <div class="tc-type persuasive">Persuasive — Caribbean Identity</div>
+      <h4>Caribbean culture should be a required subject in all regional schools</h4>
+      <p>Argue that Caribbean history, music, and cultural traditions must be formally taught in schools.</p>
+    </div>
+    <div class="topic-card" data-topic="p6" onclick="pickTopic('persuasive','p6',this)">
+      <div class="tc-type persuasive">Persuasive — Environment</div>
+      <h4>Single-use plastics should be completely banned in the Caribbean</h4>
+      <p>Argue that plastic pollution poses an existential threat to Caribbean ecosystems and must be outlawed.</p>
+    </div>
+  </div>
+
+  <div id="persuasive-writer" style="display:none;">
+    <div class="writing-prompt" id="persuasive-prompt-display"></div>
+    <div class="section-label">Write your essay — paragraph by paragraph</div>
+
+    <!-- INTRO -->
+    <div class="para-block" style="border-left:4px solid var(--teal);">
+      <div class="para-block-title"><span class="pb-num">Paragraph 1</span> Introduction <span class="pb-marks">~80–110 words</span></div>
+      <p>Hook + Background + Thesis. Your introduction must do three jobs. Do NOT begin with "I think" or "In my opinion."</p>
+      <div class="section-writer">
+        <div class="sw-header"><label>Hook</label><div class="sw-badges"><span class="sw-badge">Statistic / fact / anecdote</span><span class="sw-badge marks">~3 sentences</span></div></div>
+        <div class="sw-hint">A surprising statistic, a striking fact, or a short 3-sentence scene. Your hook must be directly related to your topic. Do NOT start with "Have you ever wondered…" — find a stronger opening.</div>
+        <textarea id="p-hook" class="sw-ta ta-md" placeholder="Grab the reader immediately…" oninput="autosave('persuasive'); wc(this,'wc-p-hook')"></textarea>
+        <div class="wc" id="wc-p-hook">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Background Information</label><div class="sw-badges"><span class="sw-badge">Research context</span><span class="sw-badge marks">~2 sentences</span></div></div>
+        <div class="sw-hint">Give historical context or current situation. Show you have done research. When did this issue arise? What is happening now? Use a formal, third-person tone.</div>
+        <textarea id="p-background" class="sw-ta ta-sm" placeholder="Background and context…" oninput="autosave('persuasive'); wc(this,'wc-p-background')"></textarea>
+        <div class="wc" id="wc-p-background">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Thesis Statement</label><div class="sw-badges"><span class="sw-badge warn">⚠ Must include all 3 reasons</span></div></div>
+        <div class="sw-hint">One sentence that states your position AND all three arguments. Format: "It is argued that [topic] because [reason 1], [reason 2], and [reason 3]."</div>
+        <textarea id="p-thesis" class="sw-ta ta-sm" placeholder="It is argued that… because (1)…, (2)…, and (3)…" oninput="autosave('persuasive'); wc(this,'wc-p-thesis')"></textarea>
+        <div class="wc" id="wc-p-thesis">0 words</div>
+      </div>
+    </div>
+
+    <!-- BODY 1 -->
+    <div class="para-block" style="border-left:4px solid var(--gold);">
+      <div class="para-block-title"><span class="pb-num">Paragraph 2</span> First Argument <span class="pb-marks">~100–130 words</span></div>
+      <p>Topic sentence + 3 pieces of evidence + connection to claim. Use "To begin…" or "Firstly…" to open.</p>
+      <div class="section-writer">
+        <div class="sw-header"><label>Topic Sentence</label><div class="sw-badges"><span class="sw-badge">Start with a connector</span></div></div>
+        <div class="sw-hint">One clear sentence stating your first argument. Open with a first-paragraph connector from your notes.</div>
+        <textarea id="p-b1-topic" class="sw-ta ta-sm" placeholder="To begin, it is argued that…" oninput="autosave('persuasive'); wc(this,'wc-p-b1-topic')"></textarea>
+        <div class="wc" id="wc-p-b1-topic">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Three Pieces of Evidence</label><div class="sw-badges"><span class="sw-badge warn">⚠ At least one must cite a source</span></div></div>
+        <div class="sw-hint">Write three separate sentences of evidence. Each must clearly support your topic sentence. At least one must include a named source (study, university, organisation, statistic).</div>
+        <textarea id="p-b1-evidence" class="sw-ta ta-lg" placeholder="Evidence 1: …&#10;Evidence 2: …&#10;Evidence 3: …" oninput="autosave('persuasive'); wc(this,'wc-p-b1-evidence')"></textarea>
+        <div class="wc" id="wc-p-b1-evidence">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Connection to Claim</label><div class="sw-badges"><span class="sw-badge warn">⚠ Never skip this</span></div></div>
+        <div class="sw-hint">Your last sentence must link the evidence back to your thesis. Start with "Therefore…" or "This demonstrates that…" or "It is therefore clear that…"</div>
+        <textarea id="p-b1-connect" class="sw-ta ta-sm" placeholder="Therefore, it is clear that…" oninput="autosave('persuasive'); wc(this,'wc-p-b1-connect')"></textarea>
+        <div class="wc" id="wc-p-b1-connect">0 words</div>
+      </div>
+    </div>
+
+    <!-- BODY 2 -->
+    <div class="para-block" style="border-left:4px solid var(--gold);">
+      <div class="para-block-title"><span class="pb-num">Paragraph 3</span> Second Argument <span class="pb-marks">~100–130 words</span></div>
+      <p>Topic sentence + 3 pieces of evidence + connection. Use "Furthermore…" or "In addition…" to open.</p>
+      <div class="section-writer">
+        <div class="sw-header"><label>Topic Sentence</label></div>
+        <textarea id="p-b2-topic" class="sw-ta ta-sm" placeholder="Furthermore, it is argued that…" oninput="autosave('persuasive'); wc(this,'wc-p-b2-topic')"></textarea>
+        <div class="wc" id="wc-p-b2-topic">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Three Pieces of Evidence</label><div class="sw-badges"><span class="sw-badge warn">⚠ Different evidence from paragraph 2</span></div></div>
+        <textarea id="p-b2-evidence" class="sw-ta ta-lg" placeholder="Evidence 1: …&#10;Evidence 2: …&#10;Evidence 3: …" oninput="autosave('persuasive'); wc(this,'wc-p-b2-evidence')"></textarea>
+        <div class="wc" id="wc-p-b2-evidence">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Connection to Claim</label></div>
+        <textarea id="p-b2-connect" class="sw-ta ta-sm" placeholder="This demonstrates that…" oninput="autosave('persuasive'); wc(this,'wc-p-b2-connect')"></textarea>
+        <div class="wc" id="wc-p-b2-connect">0 words</div>
+      </div>
+    </div>
+
+    <!-- BODY 3 -->
+    <div class="para-block" style="border-left:4px solid var(--gold);">
+      <div class="para-block-title"><span class="pb-num">Paragraph 4</span> Third Argument <span class="pb-marks">~100–130 words</span></div>
+      <p>Topic sentence + 3 pieces of evidence + connection. Use "Equally important…" or "Finally…" to open.</p>
+      <div class="section-writer">
+        <div class="sw-header"><label>Topic Sentence</label></div>
+        <textarea id="p-b3-topic" class="sw-ta ta-sm" placeholder="Equally important is the fact that…" oninput="autosave('persuasive'); wc(this,'wc-p-b3-topic')"></textarea>
+        <div class="wc" id="wc-p-b3-topic">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Three Pieces of Evidence</label><div class="sw-badges"><span class="sw-badge warn">⚠ Different evidence from paragraphs 2 and 3</span></div></div>
+        <textarea id="p-b3-evidence" class="sw-ta ta-lg" placeholder="Evidence 1: …&#10;Evidence 2: …&#10;Evidence 3: …" oninput="autosave('persuasive'); wc(this,'wc-p-b3-evidence')"></textarea>
+        <div class="wc" id="wc-p-b3-evidence">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Connection to Claim</label></div>
+        <textarea id="p-b3-connect" class="sw-ta ta-sm" placeholder="It is therefore evident that…" oninput="autosave('persuasive'); wc(this,'wc-p-b3-connect')"></textarea>
+        <div class="wc" id="wc-p-b3-connect">0 words</div>
+      </div>
+    </div>
+
+    <!-- COUNTER CLAIM -->
+    <div class="para-block" style="border-left:4px solid var(--coral);">
+      <div class="para-block-title"><span class="pb-num">Paragraph 5</span> Counter Claim <span class="pb-marks">~100–120 words</span></div>
+      <p>Acknowledge the other side respectfully — then dismantle it. This is where good writers prove they've done real research.</p>
+      <div class="section-writer">
+        <div class="sw-header"><label>Topic Sentence</label><div class="sw-badges"><span class="sw-badge">Start with "Admittedly…"</span></div></div>
+        <div class="sw-hint">Open with "Admittedly," or "It is true that…" to fairly acknowledge the opposing view. Do NOT argue against your own position here — just state theirs.</div>
+        <textarea id="p-counter-topic" class="sw-ta ta-sm" placeholder="Admittedly, it can be argued that…" oninput="autosave('persuasive'); wc(this,'wc-p-counter-topic')"></textarea>
+        <div class="wc" id="wc-p-counter-topic">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Their 2–3 Arguments</label><div class="sw-badges"><span class="sw-badge">Be fair to the other side</span></div></div>
+        <div class="sw-hint">Write the opposing side's strongest arguments. Do not make them weak on purpose — a strong counter claim makes your refutation more powerful.</div>
+        <textarea id="p-counter-args" class="sw-ta ta-md" placeholder="Write their best arguments here…" oninput="autosave('persuasive'); wc(this,'wc-p-counter-args')"></textarea>
+        <div class="wc" id="wc-p-counter-args">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Refutation</label><div class="sw-badges"><span class="sw-badge">Start with "However…"</span></div></div>
+        <div class="sw-hint">Now dismantle their argument. Show it is flawed, insufficient, or outweighed by your evidence. This is the most intellectually demanding part of the essay — give it full effort.</div>
+        <textarea id="p-counter-refute" class="sw-ta ta-md" placeholder="However, upon closer examination…" oninput="autosave('persuasive'); wc(this,'wc-p-counter-refute')"></textarea>
+        <div class="wc" id="wc-p-counter-refute">0 words</div>
+      </div>
+    </div>
+
+    <!-- CONCLUSION -->
+    <div class="para-block" style="border-left:4px solid var(--teal);">
+      <div class="para-block-title"><span class="pb-num">Paragraph 6</span> Conclusion <span class="pb-marks">~80–100 words</span></div>
+      <p>Restate + summarise + call to action. Do NOT introduce new arguments here. End with purpose.</p>
+      <div class="section-writer">
+        <div class="sw-header"><label>Restate Stance</label><div class="sw-badges"><span class="sw-badge">Use different words from your thesis</span></div></div>
+        <textarea id="p-conc-restate" class="sw-ta ta-sm" placeholder="In conclusion, it is evident that…" oninput="autosave('persuasive'); wc(this,'wc-p-conc-restate')"></textarea>
+        <div class="wc" id="wc-p-conc-restate">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Summary of All Three Points</label></div>
+        <div class="sw-hint">One sentence per argument. Restate them briefly in different words from your body paragraphs.</div>
+        <textarea id="p-conc-summary" class="sw-ta ta-md" placeholder="As demonstrated, … Furthermore, … Finally, …" oninput="autosave('persuasive'); wc(this,'wc-p-conc-summary')"></textarea>
+        <div class="wc" id="wc-p-conc-summary">0 words</div>
+      </div>
+      <div class="section-writer">
+        <div class="sw-header"><label>Call to Action</label><div class="sw-badges"><span class="sw-badge warn">⚠ Must be specific</span></div></div>
+        <div class="sw-hint">Who should do what? Schools? Governments? Parents? Society? Be specific. A vague call to action is a weak ending. Make it memorable.</div>
+        <textarea id="p-conc-action" class="sw-ta ta-sm" placeholder="It is therefore imperative that…" oninput="autosave('persuasive'); wc(this,'wc-p-conc-action')"></textarea>
+        <div class="wc" id="wc-p-conc-action">0 words</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-share" onclick="openShare('persuasive')">📤 Share with Dad</button>
+      <button class="btn btn-outline" onclick="clearSection('persuasive')">Start over</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ═══ COMPREHENSION ═══ -->
+<div id="pane-comp" class="pane"><div class="container">
+  <div class="hero">
+    <div class="hero-label">Reading Comprehension</div>
+    <h1>Read every word. <em>Think before you write.</em></h1>
+    <p>Three challenging passages. Each one tests different skills. Answer fully — single-word answers will not get full marks.</p>
+  </div>
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="subTab('comp-1',this,'comp-sub')">Passage 1 — Fiction</button>
+    <button class="sub-tab" onclick="subTab('comp-2',this,'comp-sub')">Passage 2 — Non-Fiction</button>
+    <button class="sub-tab" onclick="subTab('comp-3',this,'comp-sub')">Passage 3 — Challenging</button>
+  </div>
+
+  <!-- PASSAGE 1 -->
+  <div id="comp-1" class="comp-sub pane active">
+    <div class="total-marks">📝 Passage 1 — Fiction &nbsp;|&nbsp; Total: 35 marks &nbsp;|&nbsp; Estimated time: 45 minutes</div>
+    <div class="passage-box">
+      <h3>The Last Rehearsal</h3>
+      <div class="passage-meta">A short story</div>
+      <p>The night before the Junior Calypso Monarch competition, Nadia could not sleep. She lay on her back staring at the ceiling fan as it made its slow circles in the dark, and she went through her song for the seventeenth time in her head. She had written it herself — every word — about the sea. About what happened to it when people stopped caring.</p>
+      <p>Her mother had tried to comfort her at dinner. "You know it, baby," she had said, placing a bowl of pelau in front of her. "You know every single word." Nadia had nodded and eaten in silence and gone to bed at nine, as if an early night could somehow make the morning arrive better prepared.</p>
+      <p>But at two in the morning she was still awake, and she had begun to doubt herself in that slow, corrosive way that doubt has when there is nothing else to occupy the mind. Maybe the other contestants had better songs. Maybe her voice would crack at the crucial moment, the way it had at the Christmas concert in Form Two. Maybe the judges would not care about the sea.</p>
+      <p>She got up, walked quietly to the kitchen, and made herself a cup of hot chocolate the way her father used to make it — two sugars, a pinch of cinnamon, stirred exactly twelve times. He had been gone three years, but his recipe remained. She sat at the kitchen table and drank it slowly, and somewhere in the warmth of it she found something that was not quite courage but was close enough to function as one.</p>
+      <p>In the morning, she stood in the wings of the stage at the Cultural Centre, watching the contestant before her finish to generous applause. She was twelve years old, five feet tall, and holding a song she had built from scratch. When the compere called her name, she walked out into the white light and opened her mouth.</p>
+      <p>She did not win first place. She came second. But as she walked off the stage with her runner-up ribbon, the head judge — a woman with short silver hair who had been adjudicating Calypso competitions for thirty years — caught her by the arm.</p>
+      <p>"That song," the woman said quietly. "Who wrote it?"</p>
+      <p>"I did," said Nadia.</p>
+      <p>The woman looked at her for a long moment. "Keep writing," she said. "You have something."</p>
+      <p>On the drive home, Nadia held the ribbon in her lap and watched the island go by through the window — the cane fields, the old stone walls, the sea glinting in the distance. She thought about what "something" meant. She thought it might take her a long time to find out. She decided that was all right.</p>
+      <div class="gloss"><strong>Glossary:</strong> <em>corrosive</em> — slowly damaging or destroying something; <em>compere</em> — the host who announces performers; <em>adjudicating</em> — judging a competition officially</div>
+    </div>
+
+    <div class="section-label">Answer all questions. Use evidence from the passage.</div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 1</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Retrieval</span><span class="q-marks">2 marks</span></div></div>
+      <div class="q-q">At what time does Nadia get out of bed, and what does she make? Use specific details from the passage in your answer.</div>
+      <textarea style="min-height:70px;" id="c1q1" placeholder="Answer using details from the passage…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 2</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Retrieval + Inference</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">Nadia makes the hot chocolate "the way her father used to make it." What does this action tell us about her relationship with her father? What do we learn about her father from the passage?</div>
+      <textarea style="min-height:90px;" id="c1q2" placeholder="Write a full answer…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 3</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Language</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">The author describes doubt as something that works "in that slow, corrosive way that doubt has when there is nothing else to occupy the mind." <br>(a) What does the word <em>corrosive</em> usually mean?<br>(b) Why is it an effective word to use here to describe doubt? Explain fully.</div>
+      <textarea style="min-height:100px;" id="c1q3" placeholder="(a) …&#10;(b) …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 4</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Inference</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">Nadia "found something that was not quite courage but was close enough to function as one." What do you think she found? Why does the author say it was not "quite" courage?</div>
+      <textarea style="min-height:90px;" id="c1q4" placeholder="Explain what you think she found and why…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 5</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Language</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">Read this sentence: "She was twelve years old, five feet tall, and holding a song she had built from scratch." What technique does the author use here, and what effect does it create? Why are the physical details important?</div>
+      <textarea style="min-height:90px;" id="c1q5" placeholder="Identify the technique and explain the effect…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 6</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Vocabulary</span><span class="q-marks">2 marks</span></div></div>
+      <div class="q-q">What does the word <em>adjudicating</em> (see glossary) mean? Use it in a sentence of your own about a school competition.</div>
+      <textarea style="min-height:70px;" id="c1q6" placeholder="Definition: …&#10;My sentence: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 7</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Narrative Structure</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">This story has a clear narrative arc.<br>(a) Identify the CLIMAX of the story and explain why that moment is the turning point.<br>(b) Identify the RESOLUTION and explain what Nadia decides at the end.</div>
+      <textarea style="min-height:110px;" id="c1q7" placeholder="(a) Climax: …&#10;&#10;(b) Resolution: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 8</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Themes</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">The head judge tells Nadia: "You have something." Nadia then thinks it "might take her a long time to find out" what that means. <br>What do you think "something" refers to? Is this a hopeful ending or a disappointing one? Use evidence from the passage to support your view.</div>
+      <textarea style="min-height:110px;" id="c1q8" placeholder="Write a developed answer using evidence…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 9</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Personal Response</span><span class="q-marks">5 marks</span></div></div>
+      <div class="q-q">Nadia did not win first place, but the story suggests she gained something more valuable. Do you agree? Think about a time you worked hard for something and either won or did not win. What did the experience teach you? Write a full paragraph using ideas from the story AND your own experience. Your answer must be at least 100 words.</div>
+      <textarea style="min-height:160px;" id="c1q9" placeholder="Write your full developed paragraph here…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 10 — Extended Writing</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Creative Response</span><span class="q-marks">5 marks</span></div></div>
+      <div class="q-q">Imagine you are the head judge who spoke to Nadia after the competition. Write a short diary entry (at least 80 words) describing what you saw, what you thought when you heard Nadia's song, and why you decided to speak to her. Use descriptive language.</div>
+      <textarea style="min-height:160px;" id="c1q10" placeholder="Dear Diary,&#10;&#10;Today at the competition…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="btn-row"><button class="btn btn-share" onclick="openShare('comp1')">📤 Share with Dad</button></div>
+  </div>
+
+  <!-- PASSAGE 2 -->
+  <div id="comp-2" class="comp-sub pane">
+    <div class="total-marks">📝 Passage 2 — Non-Fiction (Informational) &nbsp;|&nbsp; Total: 35 marks &nbsp;|&nbsp; Estimated time: 45 minutes</div>
+    <div class="passage-box">
+      <h3>The Steel Pan: Born in the Rubbish Heap, Heard Around the World</h3>
+      <div class="passage-meta">Informational article</div>
+      <p>Of all the musical instruments ever invented, the steel pan is perhaps the most unlikely. It was not designed in a laboratory or crafted by a master luthier in a European workshop. It was born in the slums of Port of Spain, Trinidad, in the 1930s and 1940s, hammered into existence by young men who had been banned from playing drums and were determined to make music anyway.</p>
+      <p>The story begins with the British colonial government. Alarmed by the power of drumming to unite communities — particularly during Carnival — the authorities banned African drums in Trinidad in 1884. For decades, the population found workarounds: bamboo percussion groups called tamboo bamboo filled the void, creating complex rhythms by striking lengths of bamboo on the ground and against each other. When bamboo was also eventually restricted, musicians turned to whatever they could find: dustbin lids, biscuit tins, car parts.</p>
+      <p>Somewhere around 1939, a musician from the Laventille neighbourhood of Port of Spain discovered that a paint tin which had been left in the sun and dented in a particular way could produce different pitches depending on where it was struck. This observation — that a concave metal surface, properly shaped, could become a tuned musical instrument — was the breakthrough that changed everything.</p>
+      <p>Over the following decades, the steel pan evolved rapidly. Craftsmen called "tuners" developed techniques for hammering oil drum bottoms into the curved, divided surfaces we recognise today. By the 1950s, steel bands were competing in Carnival, drawing enormous crowds. By the 1960s, the instrument had begun to travel internationally, introduced to Britain and North America by Caribbean immigrants.</p>
+      <p>Today, the steel pan is recognised as Trinidad and Tobago's national instrument and is played in orchestras, schools, and concert halls around the world. The London Symphony Orchestra has performed alongside steel bands. Universities in the United States offer degrees in pan performance. What began as an act of creative defiance in the face of colonial repression has become a globally celebrated art form.</p>
+      <p>Yet despite this success, the people who built this instrument — the panmen of Laventille and the East Dry River communities — remained largely poor and unrecognised for much of the twentieth century. The instrument travelled the world; its inventors often did not. It is a story that sits alongside the steel pan's triumph as an uncomfortable reminder that recognition and justice do not always arrive together.</p>
+      <div class="gloss"><strong>Glossary:</strong> <em>luthier</em> — a craftsperson who makes stringed instruments; <em>concave</em> — curved inward like a bowl; <em>defiance</em> — bold resistance against authority; <em>repression</em> — using force to control people</div>
+    </div>
+
+    <div class="section-label">Answer all questions. Use evidence from the passage.</div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 1</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Retrieval</span><span class="q-marks">2 marks</span></div></div>
+      <div class="q-q">Why were African drums banned in Trinidad, and in what year did this happen? Give two specific details.</div>
+      <textarea style="min-height:70px;" id="c2q1" placeholder="Answer with specific details from the passage…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 2</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Retrieval + Sequence</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">Describe the sequence of events that led to the creation of the steel pan. Use your answer to show you have read the passage carefully — list at least FOUR steps in order.</div>
+      <textarea style="min-height:120px;" id="c2q2" placeholder="Step 1: …&#10;Step 2: …&#10;Step 3: …&#10;Step 4: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 3</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Vocabulary</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">(a) What does the word <em>defiance</em> mean?<br>(b) The author describes the steel pan as "an act of creative defiance." Why is this phrase significant? What does it suggest about the people who invented it?</div>
+      <textarea style="min-height:100px;" id="c2q3" placeholder="(a) …&#10;(b) …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 4</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Inference</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">The author writes: "The instrument travelled the world; its inventors often did not." <br>(a) What point is the author making here?<br>(b) Why do you think the author chose to include this fact? What does it add to the article?</div>
+      <textarea style="min-height:110px;" id="c2q4" placeholder="(a) …&#10;(b) …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 5</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Language + Writer's Craft</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">The author opens with: "Of all the musical instruments ever invented, the steel pan is perhaps the most unlikely." <br>(a) What is the effect of starting with "Of all the musical instruments ever invented"?<br>(b) Why does the author use the word "unlikely"? What does it make you expect from the article?</div>
+      <textarea style="min-height:110px;" id="c2q5" placeholder="(a) …&#10;(b) …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 6</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Fact vs Opinion</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">The last paragraph contains both facts and the author's opinion. Write down ONE fact and ONE opinion from that paragraph. Then explain how you can tell the difference between them.</div>
+      <textarea style="min-height:100px;" id="c2q6" placeholder="Fact: …&#10;Opinion: …&#10;How I can tell: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 7</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Text Type</span><span class="q-marks">2 marks</span></div></div>
+      <div class="q-q">How do you know this is a non-fiction text? Give TWO features of the writing that make it different from a fiction text like Passage 1.</div>
+      <textarea style="min-height:80px;" id="c2q7" placeholder="Feature 1: …&#10;Feature 2: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 8</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Personal Response</span><span class="q-marks">5 marks</span></div></div>
+      <div class="q-q">The steel pan was created by people who were told they could not play music — and they found a way anyway. You are a performer yourself. Write a developed paragraph (at least 100 words) explaining what this story means to you personally, and what you think it teaches young people about creativity and persistence.</div>
+      <textarea style="min-height:160px;" id="c2q8" placeholder="Write your personal response here…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 9 — Extended Writing</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Persuasive Response</span><span class="q-marks">8 marks</span></div></div>
+      <div class="q-q">Using information from this passage AND your own knowledge, write a persuasive paragraph (at least 120 words) arguing that Caribbean musical traditions like the steel pan and calypso should be taught in every Caribbean school. Use at least TWO pieces of evidence from the passage, and include: a topic sentence, supporting evidence, and a connection back to your argument.</div>
+      <textarea style="min-height:190px;" id="c2q9" placeholder="Write your persuasive paragraph here…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="btn-row"><button class="btn btn-share" onclick="openShare('comp2')">📤 Share with Dad</button></div>
+  </div>
+
+  <!-- PASSAGE 3 — MOST CHALLENGING -->
+  <div id="comp-3" class="comp-sub pane">
+    <div class="total-marks">📝 Passage 3 — The Challenge Passage &nbsp;|&nbsp; Total: 40 marks &nbsp;|&nbsp; Estimated time: 55 minutes &nbsp;|&nbsp; ⚠ Most difficult</div>
+    <div class="passage-box">
+      <h3>Two Letters</h3>
+      <div class="passage-meta">A paired text exercise — read BOTH letters before answering any questions</div>
+      <p><strong>Letter A: From a school principal to parents</strong></p>
+      <p>Dear Parents and Guardians,</p>
+      <p>I am writing to inform you of a difficult but necessary decision made by the school board at our most recent meeting. With effect from the new academic year, the school will be discontinuing its Music and Visual Arts programmes. This decision has not been taken lightly. Faced with significant budgetary constraints and the requirement to improve our national examination results in Mathematics and English Language, the board has concluded that resources must be redirected toward core academic subjects.</p>
+      <p>We are aware that many students have benefited from these programmes, and we do not underestimate the value of creative expression. However, in the current climate, we believe this is the most responsible course of action. The school's primary obligation is to equip students with the qualifications they need to succeed in secondary school and beyond.</p>
+      <p>We thank you for your continued support and understanding.</p>
+      <p>Yours sincerely,<br>Mrs. A. Clarke, Principal</p>
+      <br>
+      <p><strong>Letter B: Reply from a parent</strong></p>
+      <p>Dear Mrs. Clarke,</p>
+      <p>I have read your letter with both sadness and frustration, and I feel compelled to respond.</p>
+      <p>My daughter has been in your Music programme for three years. In that time, I have watched her grow from a child who struggled to speak in front of more than two people into a young woman who recently performed before an audience of several hundred. Her confidence, her discipline, her ability to work under pressure — all of it came from music. I do not believe Mathematics gave her that. I believe music did.</p>
+      <p>I also want to challenge the assumption that academic results and creative education are in competition with each other. Research from Johns Hopkins University, Harvard, and numerous other institutions has shown consistently that students engaged in arts education perform better, not worse, in core academic subjects. You are not choosing between art and achievement. You are removing something that was helping both.</p>
+      <p>I understand that budgets are real and difficult. But I would ask you to consider: what is the cost of removing the one class where a shy child finds her voice? What is the cost of telling an entire generation of students that creativity has no place in their education? Some costs do not appear on a spreadsheet.</p>
+      <p>I am asking you, respectfully but firmly, to reconsider.</p>
+      <p>Yours sincerely,<br>A concerned parent</p>
+      <div class="gloss"><strong>Glossary:</strong> <em>budgetary constraints</em> — limits on how much money can be spent; <em>compelled</em> — feeling strongly that you must do something; <em>assumption</em> — something believed to be true without proof</div>
+    </div>
+
+    <div class="section-label">Answer all questions. Both letters must be read before starting.</div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 1</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Retrieval — Letter A</span><span class="q-marks">2 marks</span></div></div>
+      <div class="q-q">According to Letter A, give TWO reasons why the school is discontinuing the Music and Visual Arts programmes.</div>
+      <textarea style="min-height:70px;" id="c3q1" placeholder="Reason 1: …&#10;Reason 2: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 2</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Retrieval — Letter B</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">According to Letter B, what THREE changes did the parent observe in her daughter as a result of the Music programme?</div>
+      <textarea style="min-height:80px;" id="c3q2" placeholder="Change 1: …&#10;Change 2: …&#10;Change 3: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 3</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Compare — Tone</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">Compare the tone of Letter A and Letter B.<br>(a) How would you describe the tone of Mrs. Clarke's letter? Find ONE word or phrase that supports your answer.<br>(b) How would you describe the tone of the parent's letter? Find ONE word or phrase that supports your answer.</div>
+      <textarea style="min-height:110px;" id="c3q3" placeholder="(a) Letter A tone: …&#10;Evidence: …&#10;&#10;(b) Letter B tone: …&#10;Evidence: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 4</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Language Analysis</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">The parent writes: "Some costs do not appear on a spreadsheet." <br>(a) What does this sentence mean in your own words?<br>(b) Why is this sentence particularly powerful as an argument? What technique does it use?</div>
+      <textarea style="min-height:110px;" id="c3q4" placeholder="(a) In my own words: …&#10;(b) Why it is powerful: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 5</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Persuasive Techniques</span><span class="q-marks">4 marks</span></div></div>
+      <div class="q-q">Letter B uses several persuasive techniques. Identify TWO techniques used in Letter B and give a quote from the letter to support each one. Explain why each technique is effective.</div>
+      <textarea style="min-height:130px;" id="c3q5" placeholder="Technique 1: …&#10;Quote: …&#10;Effect: …&#10;&#10;Technique 2: …&#10;Quote: …&#10;Effect: …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 6</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Vocabulary in Context</span><span class="q-marks">3 marks</span></div></div>
+      <div class="q-q">(a) What does "compelled" mean as used in Letter B?<br>(b) Why does the parent use this word rather than simply saying "I wanted to respond"? What does it suggest about how she feels?</div>
+      <textarea style="min-height:90px;" id="c3q6" placeholder="(a) …&#10;(b) …" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 7</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Critical Thinking</span><span class="q-marks">5 marks</span></div></div>
+      <div class="q-q">Both writers have valid points. After reading both letters, whose argument do you find more convincing — Mrs. Clarke's or the parent's? Write a developed answer (at least 100 words) giving at least THREE reasons for your choice. Refer to specific parts of both letters in your answer.</div>
+      <textarea style="min-height:180px;" id="c3q7" placeholder="I find [name]'s argument more convincing because…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 8 — Extended Writing</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Letter Writing</span><span class="q-marks">8 marks</span></div></div>
+      <div class="q-q">Write Mrs. Clarke's reply to the parent (at least 150 words). In her reply, Mrs. Clarke must: (1) acknowledge the parent's concerns respectfully, (2) explain the school's position more fully, and (3) propose one alternative that might help students who are passionate about music. Your letter must be written in a formal tone and set out correctly (Dear…, Yours sincerely…). You will be marked on: content, persuasive language, formal tone, and letter structure.</div>
+      <textarea style="min-height:220px;" id="c3q8" placeholder="Dear [Parent],&#10;&#10;Thank you for your letter…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="q-comp">
+      <div class="q-comp-header"><span class="q-num">Question 9 — Reflection</span><div style="display:flex;gap:6px;"><span class="q-type-tag">Personal + Analytical</span><span class="q-marks">7 marks</span></div></div>
+      <div class="q-q">You are a student at the school in these letters. Your Music class is being cancelled. Write your own letter to Mrs. Clarke (at least 150 words) arguing that the decision should be reversed. Your letter must: (1) include a formal greeting and sign-off, (2) acknowledge that the school has budget difficulties, (3) use at least TWO pieces of evidence (from Passage 2, Passage 3, or your own research), (4) include one personal story or example from your own experience with music. You will be marked on: argument quality, use of evidence, language, and structure.</div>
+      <textarea style="min-height:240px;" id="c3q9" placeholder="Dear Mrs. Clarke,&#10;&#10;I am writing to you as a student who…" oninput="autosave('comp')"></textarea>
+    </div>
+
+    <div class="btn-row"><button class="btn btn-share" onclick="openShare('comp3')">📤 Share with Dad</button></div>
+  </div>
+
+</div></div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeShare()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeShare()">✕</button>
+    <h2>📤 Share with Dad</h2>
+    <div class="modal-sub">Your work is packaged below. Tap <strong>Copy</strong>, then paste into WhatsApp or a message to Dad. He will send it for feedback.</div>
+    <textarea id="share-text" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-teal" onclick="doCopy()">📋 Copy</button>
+      <button class="btn btn-outline" onclick="closeShare()">Close</button>
+    </div>
+    <div id="copy-ok" style="font-size:12px;font-family:'Arial',sans-serif;color:var(--success);margin-top:8px;display:none;">✓ Copied! Paste it into your message to Dad.</div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const JBIN='https://api.jsonbin.io/v3';
+const BID='6a21fd28da38895dfe892fd2';
+const AKEY='$2a$10$YdbExlb2BaD00NW/hIKjcOXwJR/0mx3D/.vsZ62yW6gUFVqNlUQyO';
+const PFX='aeva_eng_';
+
+const NF=['n-intro','n-rising','n-climax','n-falling','n-resolution'];
+const PF=['p-hook','p-background','p-thesis','p-b1-topic','p-b1-evidence','p-b1-connect','p-b2-topic','p-b2-evidence','p-b2-connect','p-b3-topic','p-b3-evidence','p-b3-connect','p-counter-topic','p-counter-args','p-counter-refute','p-conc-restate','p-conc-summary','p-conc-action'];
+const CF=['c1q1','c1q2','c1q3','c1q4','c1q5','c1q6','c1q7','c1q8','c1q9','c1q10','c2q1','c2q2','c2q3','c2q4','c2q5','c2q6','c2q7','c2q8','c2q9','c3q1','c3q2','c3q3','c3q4','c3q5','c3q6','c3q7','c3q8','c3q9'];
+
+let sTimer=null,saving=false;
+
+function sync(s,m){const d=document.getElementById('sync-dot'),l=document.getElementById('sync-label');d.className='sync-dot '+s;l.textContent=m;if(s==='ok')setTimeout(()=>{d.className='sync-dot';l.textContent='';},4000);}
+
+function showPane(id,btn){document.querySelectorAll('.pane[id^="pane-"]').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.main-nav button').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+
+function subTab(id,btn,grp){document.querySelectorAll('.'+grp).forEach(p=>p.classList.remove('active'));btn.parentElement.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+
+function pickTopic(type,id,el){
+  document.querySelectorAll('#'+type+'-topics .topic-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const title=el.querySelector('h4').textContent;
+  const desc=el.querySelector('p').textContent;
+  const tp=type==='narrative'?'Narrative Essay':'Persuasive Essay';
+  const req=type==='narrative'
+    ?'<div class="wp-req">✓ Min 450 words total &nbsp;·&nbsp; ✓ All 5 sections required &nbsp;·&nbsp; ✓ At least 3 senses &nbsp;·&nbsp; ✓ At least 1 dialogue &nbsp;·&nbsp; ✓ At least 1 figurative language technique</div>'
+    :'<div class="wp-req">✓ All 6 paragraphs required &nbsp;·&nbsp; ✓ Thesis must name all 3 arguments &nbsp;·&nbsp; ✓ Each body paragraph needs a connection sentence &nbsp;·&nbsp; ✓ Formal tone — no "I/you/he/she" in body paragraphs &nbsp;·&nbsp; ✓ Counter claim must include refutation</div>';
+  document.getElementById(type+'-prompt-display').innerHTML='<div class="wp-tag">Your chosen topic</div><div class="wp-type">'+tp+'</div><h3>'+title+'</h3><p>'+desc+'</p>'+req;
+  document.getElementById(type+'-writer').style.display='block';
+  document.getElementById(type+'-writer').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function wc(ta,wcId){const n=ta.value.trim().split(/s+/).filter(w=>w.length>0).length;const el=document.getElementById(wcId);if(el)el.textContent=n+' word'+(n!==1?'s':'');}
+
+function autosave(sec){clearTimeout(sTimer);sync('saving','typing…');sTimer=setTimeout(doSave,2200);}
+
+async function doSave(){
+  if(saving)return;saving=true;sync('saving','saving…');
+  let rec={};
+  try{const r=await fetch(JBIN+'/b/'+BID+'/latest',{headers:{'X-Master-Key':AKEY}});const d=await r.json();if(r.ok)rec=d.record||{};}catch(e){}
+  [...NF,...PF,...CF].forEach(id=>{const el=document.getElementById(id);if(el)rec[PFX+id]=el.value;});
+  ['narrative','persuasive'].forEach(t=>{const s=document.querySelector('#'+t+'-topics .topic-card.selected');if(s)rec[PFX+t+'_topic']=s.dataset.topic+'|'+s.querySelector('h4').textContent;});
+  try{
+    const r=await fetch(JBIN+'/b/'+BID,{method:'PUT',headers:{'Content-Type':'application/json','X-Master-Key':AKEY},body:JSON.stringify(rec)});
+    const now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    sync(r.ok?'ok':'err',r.ok?'saved ✓ '+now:'save error');
+  }catch(e){sync('err','offline');}
+  saving=false;
+}
+
+async function autoLoad(){
+  sync('saving','loading…');
+  try{
+    const r=await fetch(JBIN+'/b/'+BID+'/latest',{headers:{'X-Master-Key':AKEY}});
+    const d=await r.json();if(!r.ok){sync('err','load failed');return;}
+    const rec=d.record||{};
+    [...NF,...PF,...CF].forEach(id=>{const el=document.getElementById(id);if(el&&rec[PFX+id])el.value=rec[PFX+id];});
+    ['narrative','persuasive'].forEach(t=>{const v=rec[PFX+t+'_topic'];if(v){const[tid]=v.split('|');const c=document.querySelector('#'+t+'-topics [data-topic="'+tid+'"]');if(c)pickTopic(t,tid,c);}});
+    NF.forEach(id=>{const el=document.getElementById(id);if(el)wc(el,'wc-'+id);});
+    PF.forEach(id=>{const el=document.getElementById(id);if(el)wc(el,'wc-'+id);});
+    const now=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    sync('ok','loaded '+now);
+  }catch(e){sync('err','offline');}
+}
+
+function buildShare(type){
+  const now=new Date().toLocaleString();
+  let t='ADIAHA\'S ENGLISH WORK\nShared: '+now+'\n'+'='.repeat(42)+'\n\n';
+  if(type==='narrative'){
+    const s=document.querySelector('#narrative-topics .topic-card.selected');
+    t+='NARRATIVE ESSAY\nTopic: '+(s?s.querySelector('h4').textContent:'Not selected')+'\n\n';
+    const labs=['INTRODUCTION','RISING ACTION','CLIMAX','FALLING ACTION','RESOLUTION'];
+    NF.forEach((id,i)=>{const el=document.getElementById(id);t+='--- '+labs[i]+' ---\n'+(el?(el.value||'[not written]'):'')+'\n\n';});
+  } else if(type==='persuasive'){
+    const s=document.querySelector('#persuasive-topics .topic-card.selected');
+    t+='PERSUASIVE ESSAY\nTopic: '+(s?s.querySelector('h4').textContent:'Not selected')+'\n\n';
+    const labs={'p-hook':'Hook','p-background':'Background','p-thesis':'Thesis','p-b1-topic':'Body 1 Topic','p-b1-evidence':'Body 1 Evidence','p-b1-connect':'Body 1 Connection','p-b2-topic':'Body 2 Topic','p-b2-evidence':'Body 2 Evidence','p-b2-connect':'Body 2 Connection','p-b3-topic':'Body 3 Topic','p-b3-evidence':'Body 3 Evidence','p-b3-connect':'Body 3 Connection','p-counter-topic':'Counter Claim Topic','p-counter-args':'Counter Claim Arguments','p-counter-refute':'Counter Claim Refutation','p-conc-restate':'Conclusion Restate','p-conc-summary':'Conclusion Summary','p-conc-action':'Call to Action'};
+    PF.forEach(id=>{const el=document.getElementById(id);t+='--- '+labs[id]+' ---\n'+(el?(el.value||'[not written]'):'')+'\n\n';});
+  } else if(type.startsWith('comp')){
+    const num=type.replace('comp','');
+    const titles={1:'The Last Rehearsal (Fiction)',2:'The Steel Pan: Born in the Rubbish Heap (Non-Fiction)',3:'Two Letters (Challenging Paired Text)'};
+    t+='COMPREHENSION — Passage '+num+': '+titles[parseInt(num)]+'\n\n';
+    const max={1:10,2:9,3:9};
+    for(let q=1;q<=max[parseInt(num)];q++){const id='c'+num+'q'+q;const el=document.getElementById(id);t+='Q'+q+':\n'+(el?(el.value||'[not answered]'):'[not answered]')+'\n\n';}
+  }
+  return t;
+}
+
+function openShare(type){document.getElementById('share-text').value=buildShare(type);document.getElementById('copy-ok').style.display='none';document.getElementById('share-modal').classList.add('open');}
+function closeShare(){document.getElementById('share-modal').classList.remove('open');}
+function doCopy(){const ta=document.getElementById('share-text');ta.select();try{document.execCommand('copy');}catch(e){}if(navigator.clipboard)navigator.clipboard.writeText(ta.value).catch(()=>{});document.getElementById('copy-ok').style.display='block';toast('Copied! Paste into WhatsApp.');}
+function clearSection(t){if(!confirm('Clear all '+t+' writing?'))return;const f=t==='narrative'?NF:PF;f.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});autosave(t);}
+function toast(m,d=2500){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',d);}
+
+autoLoad();
+</script>
+</body>
+</html>
